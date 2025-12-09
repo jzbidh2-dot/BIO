@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minh Triết - Social Media Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --primary: #8b5cf6; --secondary: #ec4899; --dark: #0f172a; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--dark); color: white; overflow-x: hidden; }
+        
+        /* Hiệu ứng nền */
+        .bg-animated { background: radial-gradient(circle at 50% 50%, #1e1b4b, #000); position: fixed; inset: 0; z-index: -1; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float 10s infinite ease-in-out; }
+        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--primary); }
+        .orb-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--secondary); animation-delay: -5s; }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+        
+        .btn-grad { background-image: linear-gradient(to right, #DA22FF 0%, #9733EE 51%, #DA22FF 100%); transition: 0.5s; background-size: 200% auto; color: white; border-radius: 12px; }
+        .btn-grad:hover { background-position: right center; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); }
+        
+        /* Chat Widget Animations */
+        #chat-widget { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(120%) scale(0.9); opacity: 0; }
+        #chat-widget.active { transform: translateY(0) scale(1); opacity: 1; }
+        
+        .msg-enter { animation: slideIn 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% {transform: translate(0,0);} 50% {transform: translate(20px, 20px);} }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+
+        /* Typing Indicator */
+        .typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #fff; animation: typing 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-animated"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+    <div class="glass-panel w-full max-w-5xl rounded-3xl flex flex-col md:flex-row overflow-hidden relative z-10 shadow-2xl">
+        
+        <div class="md:w-[35%] p-8 flex flex-col items-center text-center border-b md:border-b-0 md:border-r border-white/5 bg-black/20 relative">
+            <div class="relative w-40 h-40 mb-5 group">
+                <div class="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-500"></div>
+                <img id="u-avatar" src="https://sf-static.upanhlaylink.com/img/image_202512052dab5184a8ed01d8e49aa61e8f6d66b5.jpg" class="relative w-full h-full rounded-full object-cover border-4 border-[#1a1a1a] z-10">
+                <div class="absolute bottom-2 right-2 w-5 h-5 bg-green-500 rounded-full border-4 border-[#1a1a1a] z-20"></div>
+            </div>
+            
+            <h1 id="u-name" class="text-3xl font-black text-white mb-2 tracking-tight">MINH TRIẾT</h1>
+            <p id="u-bio" class="text-sm text-purple-300 font-semibold tracking-widest uppercase mb-8">SOCIAL SUPPORT</p>
+            
+            <div class="w-full grid grid-cols-2 gap-3 mt-auto">
+                <a href="https://www.facebook.com/nguyen.minh.triet.71039/" target="_blank" class="glass-panel hover:bg-white/10 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition"><i class="fab fa-facebook-f text-blue-500"></i> Facebook</a>
+
+<a href="https://zalo.me/0383539399" target="_blank" class="glass-panel hover:bg-white/10 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-phone text-green-500"></i> Zalo</a>
+               
+                <button onclick="toggleModal('price-modal')" class="col-span-2 btn-grad py-3.5 font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-purple-500/30"><i class="fas fa-crown"></i> BẢNG GIÁ VIP</button>
+            </div>
+        </div>
+
+        <div class="flex-1 p-8 md:p-10 bg-black/10">
+            <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                <span class="w-1.5 h-8 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></span> 
+                DỊCH VỤ HỖ TRỢ
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-4">
+                <button onclick="window.ai.trigger('hack')" class="glass-panel p-5 rounded-2xl flex items-center gap-5 hover:bg-white/5 transition group text-left border border-transparent hover:border-purple-500/30">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-900/20 text-red-500 flex items-center justify-center text-2xl group-hover:scale-110 transition duration-300 shadow-inner"><i class="fas fa-shield-virus"></i></div>
+                    <div>
+                        <div class="font-bold text-lg group-hover:text-red-400 transition">Khôi Phục Tài Khoản</div>
+                        <div class="text-xs text-gray-400 mt-1">Lấy lại Nick Hack, Quên mật khẩu</div>
+                    </div>
+                </button>
+
+                <button onclick="window.ai.trigger('282')" class="glass-panel p-5 rounded-2xl flex items-center gap-5 hover:bg-white/5 transition group text-left border border-transparent hover:border-orange-500/30">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-900/20 text-orange-500 flex items-center justify-center text-2xl group-hover:scale-110 transition duration-300 shadow-inner"><i class="fas fa-id-card"></i></div>
+                    <div>
+                        <div class="font-bold text-lg group-hover:text-orange-400 transition">Mở Khóa 282 / 956</div>
+                        <div class="text-xs text-gray-400 mt-1">Xác minh danh tính, Két sắt tím</div>
+                    </div>
+                </button>
+
+                <button onclick="window.ai.trigger('faq')" class="glass-panel p-5 rounded-2xl flex items-center gap-5 hover:bg-white/5 transition group text-left border border-transparent hover:border-gray-500/30">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-600/20 to-gray-900/20 text-gray-300 flex items-center justify-center text-2xl group-hover:scale-110 transition duration-300 shadow-inner"><i class="fas fa-gavel"></i></div>
+                    <div>
+                        <div class="font-bold text-lg group-hover:text-gray-300 transition">Kháng Nghị FAQ</div>
+                        <div class="text-xs text-gray-400 mt-1">Xử lý tài khoản bị Vô hiệu hóa</div>
+                    </div>
+                </button>
+
+                 <button onclick="window.ai.trigger('rip')" class="glass-panel p-5 rounded-2xl flex items-center gap-5 hover:bg-white/5 transition group text-left border border-transparent hover:border-purple-500/30">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-900/20 text-purple-400 flex items-center justify-center text-2xl group-hover:scale-110 transition duration-300 shadow-inner"><i class="fas fa-skull"></i></div>
+                    <div>
+                        <div class="font-bold text-lg group-hover:text-purple-400 transition">Dịch Vụ Report (RIP)</div>
+                        <div class="text-xs text-gray-400 mt-1">Bảo vệ thương hiệu, xóa mạo danh</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="price-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 opacity-0 pointer-events-none transition duration-300">
+        <div class="w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl transform scale-95 transition duration-300" id="price-content">
+            <div class="bg-gradient-to-r from-purple-900 to-[#1a1a1a] p-6 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">BẢNG GIÁ DỊCH VỤ</h3>
+                <button onclick="toggleModal('price-modal')" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-sm">
+                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                    <span class="flex items-center gap-2"><i class="fas fa-shield-virus text-red-500"></i> Khôi phục Nick</span>
+                    <span class="font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded">Thương Lượng</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                    <span class="flex items-center gap-2"><i class="fas fa-id-card text-orange-500"></i> Unlock 282/956</span>
+                    <span class="font-bold text-orange-400 bg-orange-500/10 px-2 py-1 rounded">Từ 199.000đ</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                    <span class="flex items-center gap-2"><i class="fas fa-skull text-purple-500"></i> Report/RIP</span>
+                    <span class="font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded">250.000đ</span>
+                </div>
+            </div>
+            <div class="p-4 border-t border-white/10">
+                <button onclick="window.ai.trigger('tuvan'); toggleModal('price-modal')" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition">NHẮN TIN TƯ VẤN NGAY</button>
+            </div>
+        </div>
+    </div>
+
+    <div onclick="window.ai.toggle()" class="fixed bottom-6 right-6 cursor-pointer z-40 group">
+        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full shadow-[0_0_20px_rgba(139,92,246,0.5)] flex items-center justify-center overflow-hidden border-2 border-white hover:scale-110 transition bg-[#1a1a1a] relative z-10">
+            <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png" class="w-full h-full object-cover p-1">
+        </div>
+        <div class="absolute inset-0 rounded-full bg-purple-500 animate-ping opacity-20 z-0"></div>
+        <div class="absolute -top-2 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-bounce z-20 shadow-sm">AI Support</div>
+    </div>
+
+    <div id="chat-widget" class="fixed bottom-24 right-4 left-4 md:left-auto md:right-6 md:w-[380px] h-[500px] bg-[#1a1a1a] rounded-2xl flex flex-col overflow-hidden z-40 border border-gray-700 shadow-2xl">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 flex justify-between items-center text-white shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png" class="w-10 h-10 rounded-full border border-white/20 bg-white/10 p-1">
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#1a1a1a] rounded-full"></span>
+                </div>
+                <div>
+                    <span class="font-bold block text-sm">Trợ Lý Ảo </span>
+                    <span class="text-[10px] opacity-80 uppercase tracking-wider">Luôn sẵn sàng</span>
+                </div>
+            </div>
+            <button onclick="window.ai.toggle()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div id="chat-area" class="flex-1 bg-black/40 p-4 overflow-y-auto space-y-4 custom-scroll relative">
+            <div class="flex flex-col items-start msg-enter">
+                <div class="bg-gray-800 text-gray-200 p-3 rounded-2xl rounded-tl-none text-sm border border-gray-700 shadow-sm max-w-[90%]">
+                    🤖 Chào anh/chị! Em là AI hỗ trợ tự động.<br>Em có thể giúp gì cho anh/chị ạ?
+                </div>
+            </div>
+        </div>
+        
+        <div id="scan-ui" class="absolute inset-0 bg-black/90 z-50 hidden flex-col items-center justify-center text-green-400 font-mono">
+            <div class="w-40 h-40 border-2 border-green-500/50 relative mb-4 rounded-lg overflow-hidden">
+                <div class="absolute w-full h-1 bg-green-400 shadow-[0_0_15px_#4ade80] animate-[scan_2s_infinite]"></div>
+                <img id="scan-img" class="w-full h-full object-cover opacity-50 blur-sm">
+            </div>
+            <p class="animate-pulse">ĐANG PHÂN TÍCH ẢNH...</p>
+        </div>
+
+        <div class="p-3 bg-[#111] border-t border-gray-700 flex gap-2 shrink-0">
+             <label class="cursor-pointer text-gray-400 hover:text-purple-400 p-2 transition" title="Gửi ảnh">
+                 <i class="fas fa-image text-xl"></i>
+                 <input type="file" hidden accept="image/*" onchange="window.ai.handleImage(this)">
+            </label>
+            <input id="chat-inp" type="text" placeholder="Nhập tin nhắn..." class="flex-1 bg-gray-800/50 text-white rounded-full px-4 text-sm outline-none border border-transparent focus:border-purple-500 transition" onkeypress="if(event.key=='Enter') window.ai.send()">
+            <button onclick="window.ai.send()" class="w-10 h-10 flex items-center justify-center bg-purple-600 hover:bg-purple-500 text-white rounded-full transition shadow-lg shadow-purple-900/20"><i class="fas fa-paper-plane text-sm"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpb8c8MlQZICS0qtyKeH1LFaQ50J_SbHA",
+            authDomain: "minhtriet-ai-7be2e.firebaseapp.com",
+            projectId: "minhtriet-ai-7be2e",
+            storageBucket: "minhtriet-ai-7be2e.firebasestorage.app",
+            messagingSenderId: "931603134196",
+            appId: "1:931603134196:web:8ebd2c6cbfc5de93c4d0a1",
+            measurementId: "G-M85L8CM6VV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- KHU VỰC DỮ LIỆU CỦA CHỊ MINT (DATA_NAO) ---
+        // Em đã thêm sẵn các tình huống phổ biến nhất
+        const DATA_NAO = [
+            // 1. CHÀO HỎI
+            { key: "hi", ans: "Dạ em chào anh/chị! Em có thể giúp gì cho mình ạ?" },
+            { key: "hello", ans: "anh cần hổ trợ gì cứ nói e." },
+            { key: "chào", ans: "Dạ Minh Triết xin chào! Chúc anh chị một ngày tốt lành." },
+            { key: "alo", ans: "Dạ em nghe đây ạ? Mình cần hỗ trợ vấn đề gì thế ạ?" },
+            { key: "có ai không", ans: "Dạ em đây, em trực 24/7 mà." },
+
+            // 2. GIÁ & THANH TOÁN
+            { key: "giá", ans: "Dạ tùy dịch vụ mà giá khác nhau. Anh chị bấm nút 'Bảng Giá VIP' xem cho rõ nhé." },
+            { key: "tiền", ans: "Dạ giá bên em là giá sàn rồi ạ. Inbox em báo giá cụ thể nha." },
+            { key: "bao nhiêu", ans: "Dạ ca này giá dao động. Anh gửi ảnh lỗi để em báo giá chuẩn xác nhất ạ." },
+            { key: "đắt", ans: "Tiền nào của nấy anh ơi. Bên em làm uy tín, bảo hành trọn đời mà." },
+            { key: "rẻ", ans: "Dạ rẻ hơn nữa coi chừng gặp scam đó anh." },
+            { key: "stk", ans: "💳 Vietcombank: 1036334933 - NGUYEN DUC BAO. Chuyển xong chụp bill giúp em nhé." },
+            { key: "momo", ans: " Momo em: 0794328504 (DUONG THI TUYET)." },
+            { key: "cọc", ans: "Dạ dịch vụ bên em cần cọc 50% để chạy tool ạ." },
+
+            // 3. MỞ KHÓA
+            { key: "282", ans: "Dạ lỗi 282 (quét khuôn mặt) bên em nhận mở 30p-24h về. Giá 199k." },
+            { key: "956", ans: "Dạ két sắt tím (956) chính chủ hay không chính chủ em đều cân được hết." },
+            { key: "két sắt", ans: "Dạ lỗi 956 này nhận mở qua mail hoặc ngày sinh. Anh gửi info qua Zalo em check nhé." },
+            { key: "vô hiệu hóa", ans: "Vô hiệu hóa (FAQ) có nhiều dạng (583, 723, 277...). Anh chụp màn hình em xem là dạng nào ạ." },
+            { key: "faq", ans: "FAQ kháng cần CMT/CCCD chuẩn. Anh chuẩn bị giấy tờ chưa ạ?" },
+            { key: "bị hack", ans: "Bị hack đổi pass/mail thì nhắn Zalo em gấp để kịp back lại nhé." },
+            { key: "quên mật khẩu", ans: "Quên mật khẩu thì phí rẻ thôi ạ. Inbox em lấy lại cho." },
+            { key: "pass", ans: "Lấy lại pass Facebook giá sinh viên thôi ạ." },
+            { key: "mã", ans: "Mất mã 2FA (xác thực 2 yếu tố) bên em nhận phá 15 phút là xong." },
+
+            // 4. TƯƠNG TÁC
+            { key: "like", ans: "Dạ bên em có bán Like, Follow giá rẻ cho shop bán hàng." },
+            { key: "follow", ans: "1000 Follow giá 50k. Bảo hành không tụt ạ." },
+            { key: "tick xanh", ans: "Lên tích xanh (Meta Verified) giá 3xxk/tháng. Inbox em hướng dẫn." },
+
+            // 5. RIP/REPORT
+            { key: "rip", ans: "Dạ RIP nick (Dame) giá 250k. Đảm bảo bay màu vĩnh viễn." },
+            { key: "xóa", ans: "Muốn xóa nick người yêu cũ hay tình địch ạ? Gửi link đây em xử lý cho." },
+            { key: "dame", ans: "Dame 277, Dame 808 bên em bao chất." },
+
+            // 6. UY TÍN
+            { key: "lừa đảo", ans: "Em làm ăn lấy cái tâm làm đầu. Anh có thể check legit (uy tín) của em trên các nhóm." },
+            { key: "uy tín", ans: "Anh cứ search sđt em là ra thông tin liền. Em làm nghề 5 năm rồi." },
+            { key: "bảo hành", ans: "Bảo hành vĩnh viễn cho anh. Lỗi lại em fix free." },
+            
+            // 7. KHÁC
+            { key: "địa chỉ", ans: "Em ở Vĩnh Long. Anh rảnh qua mời em ly cà phê nhé." },
+            { key: "ngu", ans: "ngu cái lồn trâu nhà mày" }
+            
+        ];
+
+        // --- LOGIC CHÍNH ---
+        window.toggleModal = (id) => {
+            const modal = document.getElementById(id);
+            if(modal.classList.contains('opacity-0')) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('#price-content').classList.remove('scale-95');
+                modal.querySelector('#price-content').classList.add('scale-100');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.querySelector('#price-content').classList.remove('scale-100');
+                modal.querySelector('#price-content').classList.add('scale-95');
+            }
+        }
+
+        window.ai = {
+            isOpen: false,
+            toggle: () => { 
+                window.ai.isOpen = !window.ai.isOpen; 
+                const widget = document.getElementById('chat-widget');
+                window.ai.isOpen ? widget.classList.add('active') : widget.classList.remove('active');
+            },
+            
+            addMsg: (content, role, type='text') => {
+                const box = document.getElementById('chat-area');
+                const typing = document.getElementById('typing-indicator');
+                if(typing) typing.remove();
+
+                const d = document.createElement('div'); 
+                d.className = `flex flex-col ${role=='user'?'items-end':'items-start'} msg-enter`;
+                
+                let inner = '';
+                if(type === 'image') inner = `<img src="${content}" class="w-40 rounded-lg border border-gray-600 mb-2 shadow-md">`;
+                else inner = `<div class="${role=='user'?'bg-purple-600 text-white shadow-lg shadow-purple-900/30':'bg-gray-800 text-gray-200 border border-gray-700'} p-3 rounded-2xl ${role=='user'?'rounded-tr-none':'rounded-tl-none'} text-sm max-w-[85%] leading-relaxed">${content}</div>`;
+                
+                d.innerHTML = inner;
+                box.appendChild(d); box.scrollTop = box.scrollHeight;
+                
+                if(role === 'user') push(ref(db, 'logs'), { role, content, type, time: Date.now() });
+            },
+
+            showTyping: () => {
+                const box = document.getElementById('chat-area');
+                if(document.getElementById('typing-indicator')) return;
+                const d = document.createElement('div');
+                d.id = 'typing-indicator';
+                d.className = 'flex flex-col items-start msg-enter';
+                d.innerHTML = `<div class="bg-gray-800 p-3 rounded-2xl rounded-tl-none border border-gray-700 w-16 flex items-center justify-center gap-1"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+                box.appendChild(d); box.scrollTop = box.scrollHeight;
+            },
+
+            trigger: (key) => { 
+                if(!window.ai.isOpen) window.ai.toggle();
+                const map = {
+                    'hack': { u: "Tôi cần hỗ trợ lấy lại tài khoản.", b: "🤖 Chào anh, trường hợp này giá sẽ **Thương Lượng** tùy độ khó. Anh vui lòng gửi ảnh lỗi hoặc mô tả chi tiết để em báo giá nhé." },
+                    'faq': { u: "Tài khoản tôi bị Vô Hiệu Hóa (FAQ).", b: "🤖 Dạ, ca này bên em cần check trước. Anh gửi ảnh màn hình lỗi để em xem có cứu được không nha." },
+                    '282': { u: "Nick bị khóa 282 / 956.", b: "🤖 Dạ, mở khóa 282/956 bên em có giá niêm yết từ **199.000đ**. Anh gửi ảnh để em check dạng khóa nhé." },
+                    'rip': { u: "Tôi muốn Report/RIP nick người khác.", b: "🤖 Dịch vụ RIP nick bên em giá **250.000đ** (Bảo hành xóa vĩnh viễn). Anh gửi link nick cần xử lý ạ." },
+                    'tuvan': { u: "Tôi cần tư vấn thêm.", b: "Dạ anh cần hỗ trợ gì ạ cứ nói e(nấu không vừa ý thì xin liên hệ ad ạ)" }
+                };
+                const script = map[key] || map['tuvan'];
+                window.ai.addMsg(script.u, 'user');
+                window.ai.showTyping();
+                setTimeout(() => window.ai.addMsg(script.b, 'bot'), 1200);
+            },
+
+            send: (txt=null) => {
+                const inp = document.getElementById('chat-inp'); 
+                const content = txt || inp.value.trim(); 
+                if(!content) return; 
+                if(!txt) inp.value = ''; 
+
+                window.ai.addMsg(content, 'user');
+                window.ai.showTyping();
+
+                setTimeout(() => {
+                    let res = "🤖 Em chưa hiểu ý anh lắm, anh nhắn gọn hơn được không ạ?";
+                    const low = content.toLowerCase();
+                    
+                    // --- TÌM KIẾM TRONG DATA_NAO ---
+                    const learned = DATA_NAO.find(x => low.includes(x.key.toLowerCase()));
+                    
+                    if(learned) res = "🤖 " + learned.ans;
+                    else {
+                        if(low.includes('hack') || low.includes('mật khẩu')) res = "🤖 Vụ này anh inbox Zalo admin để thương lượng giá nha.";
+                        else if(low.includes('282') || low.includes('956') || low.includes('checkpoint')) res = "🤖 Mở khóa này giá từ 199k thôi anh.";
+                        else if(low.includes('rip') || low.includes('xóa')) res = "🤖 Xóa nick giá 250k, bay màu vĩnh viễn ạ.";
+                        else if(low.includes('giá') || low.includes('nhiêu')) res = "🤖 Anh bấm nút 'Bảng Giá VIP' ở ngoài để xem chi tiết nhé.";
+                    }
+                    window.ai.addMsg(res, 'bot');
+                }, 1000 + Math.random() * 1000);
+            },
+
+            handleImage: async (inp) => {
+                const f = inp.files[0]; if(!f) return;
+                const r = new FileReader();
+                r.onload = async (e) => {
+                    window.ai.addMsg(e.target.result, 'user', 'image');
+                    const ui = document.getElementById('scan-ui');
+                    const img = document.getElementById('scan-img');
+                    ui.style.display = 'flex'; img.src = e.target.result;
+
+                    try {
+                        const {data:{text}} = await Tesseract.recognize(f,'vie+eng');
+                        ui.style.display = 'none';
+                        const t = text.toLowerCase();
+                        let diag = "🤖 Ảnh hơi mờ, em đọc không rõ. Anh chat trực tiếp lỗi cho em nhé.";
+
+                        if(t.includes('180') || t.includes('đình chỉ') || t.includes('suspended')) diag = "🛑 <b>Phát hiện lỗi: 180 Ngày.</b><br>Ca này khó, cần kiểm tra kỹ.";
+                        else if(t.includes('vô hiệu hóa') || t.includes('disabled')) diag = "🚫 <b>Phát hiện lỗi: FAQ/Disabled.</b><br>Inbox để em báo giá kháng.";
+                        else if(t.includes('video') || t.includes('khuôn mặt') || t.includes('selfie')) diag = "📸 <b>Phát hiện lỗi: Checkpoint 282.</b><br>Giá mở: 199k.";
+                        else if(t.includes('két') || t.includes('bảo vệ') || t.includes('locked')) diag = "🔒 <b>Phát hiện lỗi: 956 (Két sắt).</b><br>Giá: Thương lượng.";
+
+                        window.ai.showTyping(); setTimeout(() => window.ai.addMsg(diag, 'bot'), 800);
+                    } catch(e) { ui.style.display = 'none'; window.ai.addMsg("🤖 Lỗi hệ thống khi quét ảnh rồi ạ.", 'bot'); }
+                }; r.readAsDataURL(f);
+            }
+        };
+    </script>
+</body>
+</html>
